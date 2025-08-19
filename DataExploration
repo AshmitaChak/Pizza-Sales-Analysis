@@ -29,3 +29,11 @@ left join hr.pizzas as p1 on o1.pizza_id = p1.pizza_id
 group by size
 order by count(*) desc
 limit 1;
+
+
+-- Task 5: Category wise distribution of pizza
+
+select category, count(distinct pizza_id) as pizza_dist, count(distinct p2.pizza_type_id) as pizza_type_dist
+from hr.pizzas as p1
+left join hr.pizza_types as p2 on p1.pizza_type_id = p2.pizza_type_id
+group by category;
