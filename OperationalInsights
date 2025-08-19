@@ -13,7 +13,9 @@ group by p1.pizza_type_id;
 
 
 
--- Task 2: with rev_pizza_type as(
+-- Task 2: Percentage contribution to revenue
+
+with rev_pizza_type as(
 select p2.name, sum(price*quantity) as rev
 from hr.pizzas as p1
 inner join hr.pizza_types as p2 on p1.pizza_type_id = p2.pizza_type_id
@@ -24,3 +26,32 @@ order by rev desc
 
 select *, sum(rev) over() as total_rev, rev/sum(rev) over() *100 as contri
 from rev_pizza_type;
+
+
+
+-- Task 3: Cumulative revenue over time
+
+select *, round(sum(rev) over(order by order_date),0)  as cumm_tot
+from
+(
+select date as order_date, sum(quantity*price) as rev
+from hr.pizzas as p1
+left join hr.order_details as o1 on p1.pizza_id = o1.pizza_id
+left join hr.orders as o2 on o1.order_id = o2.order_id
+group by date
+) as a;
+
+
+-- Task 4: Top three most ordered pizzas by rev for each pizza category
+
+select * from
+(select *, dense_rank() over(partition by category order by rev desc) as rn
+from
+(select category, name, sum(price*quantity) as rev
+from hr.pizzas as p1
+left join hr.order_details as o1 on p1.pizza_id = o1.pizza_id
+left join hr.pizza_types as p2 on p1.pizza_type_id = p2.pizza_type_id
+group by category, name
+) as a
+) as b
+where rn<=3;
