@@ -1,0 +1,43 @@
+-- Task 1: List the top 5 most ordered pizza types along with their quantities  
+
+select p2.pizza_type_id, name, sum(quantity) as most_ordered
+from hr.pizza_types as p1
+inner join hr.pizzas as p2 on p1.pizza_type_id = p2.pizza_type_id
+inner join hr.order_details as o1 on p2.pizza_id = o1.pizza_id
+group by p1.pizza_type_id, name
+order by sum(quantity) desc
+limit 5;
+
+
+-- Task 2: show hour distribution of orders
+
+select hour(time), count(*) as hour_distri_of_orders
+from hr.orders
+group by hour(time)
+order by count(*) desc;
+
+
+-- Task 3: above's percentage contribution of these hours
+
+select *
+, sum(hourly_orders) over() as total
+, hourly_orders/sum(hourly_orders) over() as contri_percent
+from
+(
+select hour(time), count(*) as hourly_orders
+from hr.orders
+group by hour(time)
+order by count(*) desc
+) as a;
+
+
+-- Task 4: Top five ordered pizzas based on revenue
+
+select p1.pizza_type_id, sum(price*quantity) as rev_of_top_five
+from hr.pizzas as p1
+inner join hr.pizza_types as p2 on p1.pizza_type_id = p2.pizza_type_id
+inner join hr.order_details as o1 on p1.pizza_id = o1.pizza_id
+group by p1.pizza_type_id
+order by sum(price*quantity) desc
+limit 3;
+
