@@ -1,0 +1,31 @@
+-- Task 1: Retrieve total number of orders
+
+select count(distinct order_id) as total_orders
+from hr.orders;
+
+
+-- Task 2: Total revenue
+
+select round(sum(p1.price * o1.quantity),2) as total_rev
+from hr.order_details as o1
+left join hr.pizzas as p1 on o1.pizza_id = p1.pizza_id; -- Here both left and inner joins work
+
+
+-- Task 3: Highest priced pizza
+
+select p1.pizza_type_id, max(price) as highest_priced
+from hr.pizzas as p1
+left join hr.pizza_types as p2 on p1.pizza_type_id = p2.pizza_type_id
+group by pizza_type_id
+order by max(price) desc
+limit 1;
+
+
+-- Task 4: Most commonly ordered pizza
+
+select size, count(*) as most_common_ordered_size
+from hr.order_details as o1
+left join hr.pizzas as p1 on o1.pizza_id = p1.pizza_id
+group by size
+order by count(*) desc
+limit 1;
